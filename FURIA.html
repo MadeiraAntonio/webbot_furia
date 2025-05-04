@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fúria Bot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 20px;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+
+        .logo-image {
+            width: 150px; /* Ajuste a largura desejada */
+            height: auto; /* Mantém a proporção da altura */
+            display: block;
+            margin: 0 auto;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-image:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-placeholder {
+            display: none; /* Esconde o elemento placeholder antigo */
+        }
+
+        .logo-placeholder:hover {
+            transform: scale(1.05);
+        }
+
+        .chat-container {
+            background-color: #1a1a1a;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-messages {
+            height: 450px;
+            overflow-y: auto;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            background-color: #222222;
+        }
+
+        .user-message, .bot-message {
+            margin: 10px 0;
+            padding: 15px 20px;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            background: #ffffff;
+            margin-left: auto;
+            color: #000000;
+        }
+
+        .bot-message {
+            background-color: #2a2a2a;
+            margin-right: auto;
+            border-left: 4px solid #ffffff;
+        }
+
+        .predefined-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #222222;
+            border-radius: 15px;
+        }
+
+        .question-btn {
+            background-color: #333333;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            border: 1px solid #ffffff;
+        }
+
+        .question-btn:hover {
+            background-color: #ffffff;
+            color: #000000;
+            transform: translateY(-2px);
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            background-color: #222222;
+            border-radius: 15px;
+        }
+
+        #entradaUsuario {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 25px;
+            background-color: #2a2a2a;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        #entradaUsuario:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #ffffff;
+            background-color: #333333;
+        }
+
+        #botaoEnviar {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            background: #ffffff;
+            color: #000000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        #botaoEnviar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ffffff;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #cccccc;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+
+            .chat-messages {
+                height: 400px;
+            }
+
+            .question-btn {
+                padding: 10px 15px;
+                font-size: 13px;
+            }
+
+            .logo-container {
+                text-align: center;
+                margin-bottom: 30px;
+                padding: 20px;
+            }
+
+            .logo-image {
+                width: 100px; /* Ajustei a largura para um valor menor */
+                height: auto;
+                display: block;
+                margin: 0 auto;
+                transition: transform 0.3s ease;
+            }
+
+            .logo-image:hover {
+                transform: scale(1.05);
+            }
+
+            .logo-placeholder {
+                display: none; /* Garante que o placeholder antigo não seja exibido */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img src="imagem_furia.png" alt="Logo da FÚRIA" class="logo-image">
+        </div>
+
+        <div class="chat-container"> <!--Caixa de conversasão do chat-->
+            <div class="chat-messages" id="mensagensChat"> 
+                <div class="bot-message">
+                    Fala furioso, bem vindo! Bora nos conhecer??
+                </div>
+            </div>
+
+            <div class="predefined-questions"> <!--Botões de perguntas predefinidas-->
+                <button class="question-btn">Qual é a história da FÚRIA?</button>
+                <button class="question-btn">Quem são os jogadores da FÚRIA?</button>
+                <button class="question-btn">Quais são os principais títulos da FÚRIA?</button>
+            </div>
+
+            <div class="chat-input"> <!--Campo de entrada de texto-->
+                <input type="text" id="entradaUsuario" placeholder="Digite sua mensagem..." autocomplete="off">
+                <button id="botaoEnviar">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Scipt's para adicionar mensagens ao chat
+        document.addEventListener('DOMContentLoaded', () => { 
+            const mensagensChat = document.getElementById('mensagensChat');
+            const entradaUsuario = document.getElementById('entradaUsuario');
+            const botaoEnviar = document.getElementById('botaoEnviar');
+            const botoesPerguntas = document.querySelectorAll('.question-btn');
+        
+            //  Base de conhecimento do time de CS
+            const knowledgeBase = [
+                { question: "qual é a história da fúria?", answer: "Imagina um time brasileiro que entrou no CS:GO com sede de sangue e nenhum medo dos gigantes. Então, essa é a FURIA. Fundada em 2017, ela surgiu como um projeto ousado; formar uma equipe que não só competisse, mas quebrasse barreiras impostas pelo cenário internacional na modalidade. E foi exatamente o que fizeram.." },
+                { question: "quem são os jogadores da fúria?", answer: "O time de CS da FÚRIA em 2025 é coisa de maluco tá! Começando com KSCERATO e yuurih, a dupla que carrega ao espírito e a alma da FÚRIA com precisão cirúrgica e uma sintonia absurda. Ao lado deles, o lendário FalleN, o “Professor”, chega com experiência, visão de jogo e aquele fator clutch que muda o cenário da partida. chelo entra com agressividade e impacto, enquanto skullz, que já deixou de ser promessa, completa o elenco com um talento afiado e atitude de veterano. Por trás de tudo isso, o técnico sidde e os estrategistas Lucid e innersh1ne comandam a tropa com foco total em glória." },
+                { question: "quem é o capitão da fúria?", answer: "O capitão da FURIA no CS:GO é o arT." },
+                { question: "quem é o técnico da fúria?", answer: "O técnico atual é o sidde, que está com a equipe há vários anos." },
+                { question: "quais os principais títulos da fúria?", answer: "Foi em 2019 que o mundo realmente ouviu o rugido da FURIA. Na DreamHack Open Summer, a equipe conquistou seu primeiro grande título internacional, deixando claro que os brasileiros não estavam ali pra fazer número. Eles atropelaram a concorrência com aquele estilo agressivo e eletrizante que virou marca registrada. Foi ali que começou a lenda, o momento em que a FURIA saiu da sombra e passou a ser temida. Em meio à pandemia, com o mundo assistindo online, a FURIA escreveu um dos capítulos mais marcantes da sua história. Venceram a 100 Thieves por 3 a 1 na final da IEM New York North America. Mas não foi só uma vitória — foi um domínio completo, mostrando que eles eram, sim, os reis do cenário NA. Esse título cravou a FURIA entre as melhores do mundo e fez a comunidade vibrar como nunca. Era o Brasil de volta ao topo. O palco foi montado na Brasil Game Show 2023, e a FURIA não decepcionou. Venceram não só o campeonato masculino, mas também o feminino, fazendo história e mostrando a força da organização como um todo. Foi uma verdadeira celebração da FURIA, em casa, com a torcida vibrando ao vivo, provando que o furacão ainda ruge alto e segue mais vivo do que nunca. Esses momentos não são só vitórias. São marcos de uma jornada épica." },
+                { question: "qual foi o maior título da fúria?", answer: "🏆 A Conquista que Firmou o Legado: IEM New York NA 2020." },
+                { question: "qual é o estilo de jogo da fúria?", answer: "A FURIA é reconhecida pelo estilo agressivo, com rushs rápidos e estratégias imprevisíveis." },
+                { question: "onde a fúria compete?", answer: "A FURIA compete nos principais campeonatos internacionais de CS:GO como ESL, BLAST, IEM e Majors." }
+            ];
+        
+            // Adiciona uma nova mensagem ao chat, tanto do usuário como bot
+            function adicionarMensagem(mensagem, ehUsuario = false) {
+                const divMensagem = document.createElement('div');
+                divMensagem.className = ehUsuario ? 'user-message' : 'bot-message';
+                divMensagem.textContent = mensagem;
+                mensagensChat.appendChild(divMensagem);
+                rolarParaBaixo();
+            }
+        
+            // Rola o chat para baixo se uma nova mensagem for adicionada
+            function rolarParaBaixo() {
+                mensagensChat.scrollTop = mensagensChat.scrollHeight;
+            }
+        
+            // Envia a mensagem digitada pelo usuário
+            function enviarMensagem() {
+                const mensagem = entradaUsuario.value.trim();
+                if (mensagem) {
+                    processarMensagemUsuario(mensagem);
+                    entradaUsuario.value = '';
+                }
+            }
+        
+            // Processa a mensagem do usuário e responde
+            function processarMensagemUsuario(mensagem) {
+                if (!mensagem.trim()) return; // Ignora mensagens vazias
+        
+                adicionarMensagem(mensagem, true); //Exibe a mensagem do usuário
+        
+                setTimeout(() => {
+                    const resposta = encontrarMelhorResposta(mensagem);//Busca a melhor resposta la na base de conhecimento
+                    adicionarMensagem(resposta);
+                }, 500);//Simulador de atraso no retorno da resposta
+            }
+        
+            // Compara a pergunta com as respostas da base de conhecimento
+            function encontrarMelhorResposta(perguntaUsuario) {
+                perguntaUsuario = perguntaUsuario.toLowerCase();
+                let melhorResposta = "Desculpe, não entendi muito bem... pode tentar perguntar de outro jeito?";
+        
+                let maiorSimilaridade = 0;
+        
+                knowledgeBase.forEach(item => {
+                    const similaridade = calcularSimilaridade(perguntaUsuario, item.question);
+                    if (similaridade > maiorSimilaridade) {
+                        maiorSimilaridade = similaridade;
+                        melhorResposta = item.answer;
+                    }
+                });
+        
+                return melhorResposta;
+            }
+        
+            //  Calcula Similaridade, quantidade de palavras iguais entre e total de palavras
+            function calcularSimilaridade(str1, str2) {
+                const palavras1 = str1.split(' ');
+                const palavras2 = str2.split(' ');
+        
+                const palavrasEmComum = palavras1.filter(palavra => palavras2.includes(palavra));
+                const totalPalavras = new Set([...palavras1, ...palavras2]).size;
+        
+                return palavrasEmComum.length / totalPalavras;
+            }
+        
+            // Evento de clique e ENTER para enviar a mensagem
+            botaoEnviar.addEventListener('click', enviarMensagem);
+            entradaUsuario.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    enviarMensagem();
+                }
+            });
+        
+            // Clique para os botões de perguntas prontas já
+            botoesPerguntas.forEach(botao => {
+                botao.addEventListener('click', () => {
+                    processarMensagemUsuario(botao.textContent);
+                });
+            });
+        });
+        </script>
+        
+</body>
+</html>
